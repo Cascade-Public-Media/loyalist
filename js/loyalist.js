@@ -1,28 +1,10 @@
-/**
- * @file
- * Javascript for the Loyalist module.
- */
-
-(function ($, Drupal, drupalSettings) {
-
-  'use strict';
-
-  /**
-   * Handles Loyalist statics through visitor's local storage.
-   *
-   * @type {Drupal~behavior}
-   *
-   * @prop {Drupal~behaviorAttach} attach
-   *   Attaches Waypoints load on page load.
-   */
-
+(function ($) {
   Drupal.behaviors.loyalist = {
-    attach: function (context) {
-      console.log(drupalSettings);
-      if ('loyalist' in drupalSettings) {
-        let $cooldown = drupalSettings.loyalist.cooldown;
-        let $interval = drupalSettings.loyalist.interval;
-        let $visits = drupalSettings.loyalist.visits;
+    attach: function (context, settings) {
+      if ('loyalist' in settings) {
+        let $cooldown = settings.loyalist.cooldown;
+        let $interval = settings.loyalist.interval;
+        let $visits = settings.loyalist.visits;
 
         if ($cooldown > 0 && $interval > 0 && $visits > 0) {
           let $now = new Date();
@@ -59,16 +41,16 @@
             let $status = localStorage.getItem('loyalist_loyalist');
 
             if ($status != null && $status === '1') {
-              $.get(drupalSettings.path.baseUrl + 'loyalist/init/returning');
+              $.get(settings.basePath + 'loyalist/init/returning');
             }
             else {
               localStorage.setItem('loyalist_loyalist', '1');
-              $.get(drupalSettings.path.baseUrl + 'loyalist/init/new');
+              $.get(settings.basePath + 'loyalist/init/new');
             }
           }
           else {
             localStorage.setItem('loyalist_loyalist', '0');
-            $.get(drupalSettings.path.baseUrl + 'loyalist/init/non');
+            $.get(settings.basePath + 'loyalist/init/non');
           }
 
           // Store log (up to a maximum of $visits).
@@ -80,5 +62,4 @@
       }
     }
   };
-
-})(jQuery, Drupal, drupalSettings);
+}(jQuery));

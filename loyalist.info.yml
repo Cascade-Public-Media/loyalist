@@ -1,9 +1,0 @@
-name: Loyalist
-type: module
-description: Define and discover "loyalist" site visitors.
-package: Rules
-core: 8.x
-configure: loyalist.settings
-
-dependencies:
-  - drupal:user

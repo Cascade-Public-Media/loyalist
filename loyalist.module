@@ -5,46 +5,112 @@
  * Primary hooks and functions for the Loyalist module.
  */
 
-use Drupal\Core\TempStore\TempStoreException;
+/**
+ * Implements hook_permission().
+ *
+ * @see hook_permission()
+ */
+function loyalist_permission() {
+  return array(
+    'administer loyalist' => array(
+      'title' => t('Administer Loyalist settings'),
+    ),
+  );
+}
 
 /**
- * Implements hook_page_attachments().
+ * Implements hook_menu().
  *
- * @see hook_page_attachments()
+ * @see hook_menu()
  */
-function loyalist_page_attachments(&$attachments) {
-  /* @var \Drupal\Core\Routing\AdminContext $admin_context */
-  $admin_context = \Drupal::service('router.admin_context');
+function loyalist_menu() {
+  $items = array();
 
-  if (!$admin_context->isAdminRoute()) {
+  $items['admin/config/people/loyalist'] = array(
+    'title' => 'Loyalist',
+    'description' => 'Define parameters for loyalist visitors.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('loyalist_settings'),
+    'access arguments' => array('administer loyalist'),
+    'file' => 'loyalist.admin.inc',
+  );
 
-    /* @var \Drupal\Core\Config\ImmutableConfig $config */
-    $config = \Drupal::config('loyalist.settings');
+  $items['loyalist/init/%'] = array(
+    'title' => 'Initialize Loyalist Session',
+    'description' => 'Adds loyalist visitor data to the session.',
+    'page callback' => 'loyalist_init_session',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
 
-    /* @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher */
-    $event_dispatcher = \Drupal::service('event_dispatcher');
+  return $items;
+}
 
-    /* @var \Drupal\Core\TempStore\PrivateTempStore $temp_store */
-    $temp_store = \Drupal::service('tempstore.private')->get('loyalist');
+/**
+ * Implements hook_page_build().
+ *
+ * @see hook_page_build()
+ */
+function loyalist_page_build(&$page) {
+  if (!path_is_admin(current_path())) {
+    drupal_add_js(drupal_get_path('module', 'loyalist') . '/js/loyalist.js');
+    drupal_add_js(array(
+      'loyalist' => array(
+        'cooldown' => variable_get('loyalist_cooldown', 0),
+        'interval' => variable_get('loyalist_interval', 0),
+        'visits' => variable_get('loyalist_visits', 0),
+        ),
+      ), 'setting'
+    );
 
-    $attachments['#attached']['library'][] = 'loyalist/loyalist';
-    $attachments['#attached']['drupalSettings']['loyalist'] = [
-      'cooldown' => $config->get('cooldown'),
-      'interval' => $config->get('interval'),
-      'visits' => $config->get('visits'),
-    ];
-
-    // Dispatch a pending event.
-    if ($event = $temp_store->get('event')) {
-      $event_dispatcher->dispatch($event::EVENT_NAME, $event);
-
-      try {
-        $temp_store->delete('event');
+    // Invoke a pending Rules event.
+    if (isset($_SESSION['loyalist'])
+      && isset($_SESSION['loyalist']['invoke'])) {
+      if (module_exists('rules')) {
+        rules_invoke_event($_SESSION['loyalist']['invoke']);
       }
-      catch (TempStoreException $e) {
-        watchdog_exception('loyalist', $e);
-      }
+      unset($_SESSION['loyalist']['invoke']);
     }
+  }
+}
 
+/**
+ * Loyalist session initialization.
+ *
+ * Because the visits log is stored local to the user and accessed only via
+ * Javascript, this information is controlled in the session so this function
+ * can be called as an AJAX request.
+ *
+ * For rules integration, an extra session variable is set the Rules event is
+ * invoked in loyalist_page_build().
+ *
+ * @param string $op
+ *   The operation to run. One of:
+ *    - "new": This session is for a new loyalist.
+ *    - "returning": This session is for a returning loyalist.
+ *    - "non": This session is for a non-loyalist.
+ *
+ * @see loyalist_menu()
+ * @see loyalist_page_build()
+ */
+function loyalist_init_session($op) {
+  $_SESSION['loyalist'] = array('loyalist' => FALSE);
+
+  switch ($op) {
+    case 'new':
+      $_SESSION['loyalist']['loyalist'] = TRUE;
+      $rule = 'loyalist_new';
+      break;
+
+    case 'returning':
+      $_SESSION['loyalist']['loyalist'] = TRUE;
+      $rule = 'loyalist_visit';
+      break;
+
+  }
+
+  if (isset($rule) && module_exists('rules')) {
+    $_SESSION['loyalist']['invoke'] = $rule;
   }
 }
