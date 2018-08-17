@@ -1,9 +1,0 @@
-name = Loyalist
-description = Define and discover "loyalist" site visitors.
-package = Rules
-
-core = 7.x
-
-scripts[] = js/loyalist.js
-
-configure = admin/config/people/loyalist
