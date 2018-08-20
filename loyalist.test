@@ -71,7 +71,7 @@ class LoyalistWebTestCase extends DrupalWebTestCase {
     $this->assertFieldById('edit-loyalist-visits', 3);
     $this->assertFieldById('edit-loyalist-cooldown', 1800);
 
-    // Update settings
+    // Update settings.
     $edit = array(
       'loyalist_interval' => 2592000,
       'loyalist_visits' => 10,

@@ -60,9 +60,8 @@ function loyalist_page_build(&$page) {
         'cooldown' => variable_get('loyalist_cooldown', 0),
         'interval' => variable_get('loyalist_interval', 0),
         'visits' => variable_get('loyalist_visits', 0),
-        ),
-      ), 'setting'
-    );
+      ),
+    ), 'setting');
 
     // Invoke a pending Rules event.
     if (isset($_SESSION['loyalist'])
