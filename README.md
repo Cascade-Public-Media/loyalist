@@ -59,6 +59,13 @@ for further information.
 CONFIGURATION
 -------------
 
+Configure user permissions in Administration » People » Permissions:
+
+ * Administer Loyalist
+
+   Users need this permission to access and configure the Loyalist module's
+   settings.
+
 The site's loyalist definition can be configured from Configuration » People » 
 Loyalist.
 

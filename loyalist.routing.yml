@@ -4,7 +4,7 @@ loyalist.settings:
     _form: '\Drupal\loyalist\Form\LoyalistSettingsForm'
     _title: 'Loyalist'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'administer loyalist'
 
 loyalist.session.init:
   path: '/loyalist/init/{op}'
