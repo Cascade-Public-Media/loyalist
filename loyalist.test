@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * @file
+ * Tests for the loyalist module.
+ */
+
+/**
+ * Functional tests.
+ *
+ * @todo Add tests for session variables and Rules integrations.
+ *
+ * @see DrupalWebTestCase
+ *
+ * @ingroup loyalist
+ */
+class LoyalistWebTestCase extends DrupalWebTestCase {
+
+  /**
+   * A privileged Drupal user.
+   *
+   * @var object
+   */
+  protected $adminUser;
+
+  /**
+   * Test information.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Loyalist Functional Tests',
+      'description' => 'Test basic Loyalist module functionality.',
+      'group' => 'Loyalist',
+    );
+  }
+
+  /**
+   * Set up the test environment.
+   *
+   * @see DrupalWebTestCase::setUp()
+   */
+  public function setUp() {
+    parent::setUp(array(
+      'loyalist',
+    ));
+
+    // Create a privileged user.
+    $this->adminUser = $this->drupalCreateUser(array(
+      'access content',
+      'administer loyalist',
+    ));
+  }
+
+  /**
+   * Test administrative functions.
+   */
+  public function testModuleAdministration() {
+    $path = '/admin/config/people/loyalist';
+
+    // Anonymous user should not have access.
+    $this->drupalGet($path);
+    $this->assertResponse(403);
+
+    // Admin user should have access.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet($path);
+    $this->assertResponse(200);
+
+    // Assert defaults.
+    $this->assertFieldById('edit-loyalist-interval', 604800);
+    $this->assertFieldById('edit-loyalist-visits', 3);
+    $this->assertFieldById('edit-loyalist-cooldown', 1800);
+
+    // Update settings
+    $edit = array(
+      'loyalist_interval' => 2592000,
+      'loyalist_visits' => 10,
+      'loyalist_cooldown' => 86400,
+    );
+    $this->drupalPost($path, $edit, t('Save configuration'));
+
+    // Assert updated settings.
+    $this->assertFieldById('edit-loyalist-interval', 2592000);
+    $this->assertFieldById('edit-loyalist-visits', 10);
+    $this->assertFieldById('edit-loyalist-cooldown', 86400);
+  }
+
+}
