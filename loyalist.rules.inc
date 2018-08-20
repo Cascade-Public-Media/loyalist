@@ -19,7 +19,7 @@ function loyalist_rules_event_info() {
     ),
     'loyalist_visit' => array(
       'group' => t('Loyalist'),
-      'label' => t('Loyalist visits the site.'),
+      'label' => t('A loyalist visits the site.'),
       'module' => 'loyalist',
     ),
   );
