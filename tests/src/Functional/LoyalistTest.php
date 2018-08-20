@@ -78,5 +78,4 @@ class LoyalistTest extends BrowserTestBase {
     $assert->fieldValueEquals('cooldown', 86400);
   }
 
-
 }

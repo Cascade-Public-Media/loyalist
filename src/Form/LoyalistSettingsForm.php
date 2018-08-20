@@ -42,11 +42,11 @@ class LoyalistSettingsForm extends ConfigFormBase {
         visitor who visits <strong>@visits times</strong> in 
         <strong>@interval</strong> with a <strong>@cooldown cooldown</strong> 
         period between visits.', [
-        '@cooldown' => \Drupal::service('date.formatter')
-          ->formatInterval($config->get('cooldown')),
-        '@interval' => \Drupal::service('date.formatter')
-          ->formatInterval($config->get('interval')),
-        '@visits' => $config->get('visits'),
+          '@cooldown' => \Drupal::service('date.formatter')
+            ->formatInterval($config->get('cooldown')),
+          '@interval' => \Drupal::service('date.formatter')
+            ->formatInterval($config->get('interval')),
+          '@visits' => $config->get('visits'),
         ]
       ),
     ];

@@ -53,7 +53,7 @@ INSTALLATION
 ------------
 
 Install as you would normally install a contributed Drupal module. See
-[Installing Drupal 8 modules](https://www.drupal.org/docs/8/extending-drupal-8/installing-drupal-8-modules)
+https://www.drupal.org/docs/8/extending-drupal-8/installing-drupal-8-modules
 for further information.
 
 CONFIGURATION
