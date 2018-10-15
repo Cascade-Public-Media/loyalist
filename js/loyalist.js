@@ -18,7 +18,6 @@
 
   Drupal.behaviors.loyalist = {
     attach: function (context) {
-      console.log(drupalSettings);
       if ('loyalist' in drupalSettings) {
         let $cooldown = drupalSettings.loyalist.cooldown;
         let $interval = drupalSettings.loyalist.interval;
